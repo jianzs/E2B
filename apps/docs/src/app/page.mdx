@@ -5,112 +5,126 @@ import { Button } from '@/components/Button'
 import { ButtonLoginToken } from '@/components/ButtonLoginToken'
 import { useSignIn } from '@/utils/useSignIn'
 
+import { LogoSymbol } from '@/components/LogoSymbol'
+import { HelloWorld } from '@/components/HelloWorld'
 
 <HeroPattern />
 
-# Sandbox for AI Apps & Agents
 
-The E2B Sandbox is a secure way to run your AI app. It is a long-running cloud environment where you can let any LLM (GPTs, Claude, local LLMs, etc) use tools exactly like you would do locally. {{ className: 'lead' }}
-
-
-## How Sandboxes Work
-Under the hood, the sandboxes are general purpose machines powered by Ubuntu. Learn more about all features and comparison to other services [here](/sandbox/overview).
-
-
-## What Can You Build with Sandboxes
-The sandboxes can do majority of the things your AI app or agent can do locally. A few popular use cases are:
-
-- **AI data analysis**
-- **Code interpreter**
-- **Run LLM-generated code**
-- **Coding copilots**
-- **AI-powered browsers in the cloud**
-
-## Quick start
-
-### 1. Create an account
-<Button variant="textLink">Sign in</Button> with your GitHub acccount.
-
-### 2. Get your API key
-After sign in, get [your API key](/getting-started/api-key) and set it in the `E2B_API_KEY` environment variable.
-
-### 3. Install the E2B SDK
-We offer both JS and Python SDK.
-
-<CodeGroup isRunnable={false}>
-```bash {{ language: 'js' }}
-npm install @e2b/sdk
-```
-
-```bash {{ language: 'python' }}
-pip install e2b
-```
-</CodeGroup>
-
-### 4. Start up the sandbox
-Sandbox is an isolated cloud environment for your AI app, agent, assistant, etc.
-
-<CodeGroup isRunnable={false}>
-```js {{ language: 'js' }}
-// 1. Import E2B
-import { Sandbox } from '@e2b/sdk'
-
-// 2. Get your Sandbox session
-const sandbox = await Sandbox.create()
-
-// 3. Close the sandbox once done
-await sandbox.close()
-```
-
-```python {{ language: 'python' }}
-# 1. Import E2B
-from e2b import Sandbox
-
-# 2. Get your Sandbox session
-sandbox = Sandbox()
-
-# 3. Close the sandbox once done
-sandbox.close()
-```
-</CodeGroup>
-
-{/* <Note>
-By default the `base` sandbox supports NodeJS 20 and Python 3.10. If you want customize your sandbox (copy files, install dependencies, etc), check out [Sandbox Templates](/sandbox/templates/custom).
-</Note> */}
-
-### Custom sandboxes
-You can create a custom sandbox with preinstalled libraries and prepared files by creating your own [Sandbox Template](/sandbox/templates/overview).
-
-{/* We offer a few [premade sandbox templates](/sandbox/template/prebuilt) for common use cases such as building code interpreters or AI browser assistans. */}
-
-### 🎉 Build your AI app
-
-Now you can let your AI app control the sandbox by using [Sandbox API](/sandbox/api/envs).
-
-{/* - [Run any code](/agents/exec) and terminal command in a sandboxed environment
-- [Start any process](/playgrounds/process) (even long-running such as a database)
-- [Run any shell command](/agents/shell-commands)
-- [Upload and download files](/playgrounds/filesystem#write-bytes)
-- Install dependencies and programs
-- [Use filesystem](/playgrounds/filesystem)
-- Access the internet
-- Start a web server that's accessible from the internet
-- [Clone git repositories](/agents/clone-repo)
-
-<div className="not-prose mb-16 mt-6 flex items-center gap-3">
-  <Button
-    href="/getting-started/installation"
-    arrow="right"
-    children="Getting Started"
-  />
-  <ButtonLoginToken />
+<div className="flex items-center justify-start gap-3">
+  <LogoSymbol className="rounded-full h-12 w-12 m-0 bg-black"/>
+  <h1 className="m-0 bg-transparent border-none">E2B</h1>
 </div>
+An open source code execution layer for AI apps and LLMs. {{ className: 'lead' }}
 
 
-## Start cloud playground
+E2B is an open source cloud infrastructure designed to help developers add **AI-powered code execution capabilities** to their AI apps.
+
+E2B makes it easy to build autonomous software that runs AI-generated code like ChatGPT-like apps with code interpreters or AI coding agents & assistants. <br />
+We distribute SDKs in [JavaScript](/todo), [TypeScript](/todo), and [Python](/todo). Our SDKs work with Node.js (`v16.0+`), Python (`v3.8+`), [serverless functions](https://todo) and [edge functions](https://) environments.
+
+## Hello World Example
+ChatGPT-like app with code interpreter based on your tech stack and with E2B running the AI-generated code.
+<HelloWorld/>
+
+```ts
+import CodeInterpreter from '@e2b/code-interpreter'
+
+CodeInterpreter.run()
+```
+Select your tech stack:
 
 
-<CodeGroupAutoload
-  path="quickstart"
-  isRunnable={false}
-/> */}
+Select runtime
+Select provider
+
+## Integrations
+We offer native integrations to popular frameworks. Follow our guides for [React](/guides/react), [Next.js](/guides/nextjs), [Svelte](/guides/nextjs), [Vue](/guides/vue), [Astro.js](/guides/astro), or [Remix](/guides/remix).
+
+**E2B works with any LLM**. Check out guides for the supported AI providers:
+  - Anyscale
+  - Anthropic
+  - AWS Bedrock
+  - Fireworks
+  - Hugging Face
+  - LangChain
+  - LlamaIndex
+  - Mistral
+  - OpenAI
+  - OpenAI Assistants
+  - OpenAI Tools (Functions)
+  - Perplexity
+  - Replicate
+  - Vercel AI SDK
+
+# TODO: Add RAG examples
+
+## Templates & Example apps
+TODO
+
+---
+
+E2B is an open source infrastructure with SDK that allows
+E2B is the cloud computer for your agent
+---
+
+Agents need:
+- agents need access to fs -> allows stateful ops
+- agents need arbitrary runtime (90 seconds vs 90 minutes)
+- download/upload
+- network access
+- state, repeated requests to the same history
+
+---
+
+
+## Hello world example
+
+
+```js
+import { Sandbox } from 'e2b'
+
+
+
+
+
+```
+
+## How E2B fits in the AI stack
+todo
+
+## Examples
+
+### Guides from our cookbook
+- Build custom GPT-4 code interpreter
+- Interactive charts
+- Streaming code execution output
+- Stateful code execution
+- Building coding agent
+- Giving coding agents skill library
+- ???
+
+### Templates
+- ??? (Have it separate?)
+- Deploy code interpreter
+- Deploy your data scientist
+
+### Use with LLMs
+- OpenAI
+- Claude
+- Mistral
+- AWS Bedrock
+- Cohere
+- Fireworks
+- Hugging Face
+- LangChain
+
+### Use from frontend
+- Nextjs
+- React.js
+- Astro.js
+
+### Use from backend
+- Vercel's serverless functions
+- Vercel's edge functions
+- Fast.api server
