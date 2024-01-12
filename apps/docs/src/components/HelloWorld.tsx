@@ -4,9 +4,8 @@ import {
 } from 'react'
 import clsx from 'clsx'
 import Image from 'next/image'
+
 import logoPython from '@/images/logos/python.svg'
-import logoTS from '@/images/logos/ts.svg'
-import logoJS from '@/images/logos/js.svg'
 import logoNode from '@/images/logos/node.svg'
 import logoVercel from '@/images/logos/vercel.svg'
 import logoCFWorkers from '@/images/logos/cf-workers.svg'
@@ -20,6 +19,10 @@ import logoReact from '@/images/logos/react.svg'
 import logoNextjs from '@/images/logos/nextjs.svg'
 import logoSvelte from '@/images/logos/svelte.svg'
 import logoAstro from '@/images/logos/astro.svg'
+import logoVuejs from '@/images/logos/vue.svg'
+import logoDeno from '@/images/logos/deno.svg'
+import logoBun from '@/images/logos/bun.svg'
+import logoPerplexity from '@/images/logos/perplexity.svg'
 
 export interface Props2 {
   onClick?: (e: any) => void
@@ -61,43 +64,9 @@ export function StackButton({
   )
 }
 
-
-export interface Props1 {
-  onClick?: (e: any) => void
-  lang: 'JavaScript' | 'TypeScript' | 'Python'
-  state?: 'default' | 'selected' | 'disabled'
-}
-export function LanguageButton({
-  onClick,
-  lang,
-  state,
-}: Props1) {
-  const langIcon = lang === 'JavaScript' ? logoJS : lang === 'TypeScript' ? logoTS : logoPython
-  return (
-    <StackButton
-      onClick={onClick}
-      icon={langIcon}
-      label={lang}
-      state={state}
-    />
-  )
-}
-
-
 export function HelloWorld() {
   return (
     <div className="flex flex-col items-start justify-start gap-4">
-      {/* <div className="flex flex-col items-start justify-start gap-1">
-        <span className="text-sm font-mono text-zinc-500">
-          1. Language
-        </span>
-        <div className="flex gap-2">
-          <LanguageButton lang="Python" />
-          <LanguageButton // state="selected" lang="TypeScript" />
-          <LanguageButton lang="JavaScript" />
-        </div>
-      </div> */}
-
       <div className="flex flex-col items-start justify-start gap-1">
         <span className="text-sm font-mono text-zinc-500">
           1. Runtime
@@ -112,13 +81,21 @@ export function HelloWorld() {
             icon={logoNode}
           />
           <StackButton
+            label="Deno"
+            icon={logoDeno}
+          />
+          <StackButton
+            label="Bun.js"
+            icon={logoBun}
+          />
+          <StackButton
             label="Vercel Edge Functions"
             icon={logoVercel}
+            state="selected"
           />
           <StackButton
             label="Vercel Serverless Functions"
             icon={logoVercel}
-          // state="selected"
           />
           <StackButton
             label="Supabase Edge Functions"
@@ -150,9 +127,12 @@ export function HelloWorld() {
             icon={logoOpenAI}
           />
           <StackButton
+            label="OpenAI Tools (Functions)"
+            icon={logoOpenAI}
+          />
+          <StackButton
             label="Mistral"
             icon={logoMistral}
-          // state="selected"
           />
           <StackButton
             label="🦜🔗  LangChain"
@@ -160,10 +140,15 @@ export function HelloWorld() {
           <StackButton
             label="Vercel AI SDK"
             icon={logoVercel}
+            state="selected"
           />
           <StackButton
             label="Anyscale"
             icon={logoAnyscale}
+          />
+          <StackButton
+            label="Perplexity"
+            icon={logoPerplexity}
           />
         </div>
       </div>
@@ -180,7 +165,11 @@ export function HelloWorld() {
           <StackButton
             label="Next.js"
             icon={logoNextjs}
-          // state="selected"
+            state="selected"
+          />
+          <StackButton
+            label="Vue.js"
+            icon={logoVuejs}
           />
           <StackButton
             label="Svelte"
@@ -192,6 +181,6 @@ export function HelloWorld() {
           />
         </div>
       </div>
-    </div>
+    </div >
   )
 }

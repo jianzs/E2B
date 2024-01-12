@@ -293,23 +293,36 @@ export function CodeGroupHeader({
                   gap-1
                 "
                 >
-                  {getPanelTitle(
-                    isValidElement(child) ? child.props : {},
-                  ).includes('JavaScript') ? (
-                    <Image
-                      src={logoNode}
-                      alt=""
-                      className="h-7 w-7"
-                      unoptimized
-                    />
-                  ) : (
-                    <Image
-                      src={logoPython}
-                      alt=""
-                      className="h-7 w-7"
-                      unoptimized
+                  {isValidElement(child) && !child.props.isFileName && (
+                    <>
+                      {getPanelTitle(
+                        isValidElement(child) ? child.props : {},
+                      ).includes('JavaScript') ? (
+                        <Image
+                          src={logoNode}
+                          alt=""
+                          className="h-7 w-7"
+                          unoptimized
+                        />
+                      ) : (
+                        <Image
+                          src={logoPython}
+                          alt=""
+                          className="h-7 w-7"
+                          unoptimized
+                        />
+                      )}
+                    </>
+                  )}
+
+                  {isValidElement(child) && (child.props as any).isFileName && (
+                    <File
+                      className="text-gray-600"
+                      size={18}
+                      strokeWidth={1}
                     />
                   )}
+
                   {getPanelTitle(isValidElement(child) ? child.props : {})}
                 </div>
               </Tab>

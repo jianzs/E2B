@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import { Guides } from '@/components/Guides'
 import { UseCases } from '@/components/UseCases'
 import { HeroPattern } from '@/components/HeroPattern'
@@ -7,15 +8,26 @@ import { useSignIn } from '@/utils/useSignIn'
 
 import { LogoSymbol } from '@/components/LogoSymbol'
 import { HelloWorld } from '@/components/HelloWorld'
+import aiStack from '@/images/ai-stack2.png'
 
 <HeroPattern />
 
 
-<div className="flex items-center justify-start gap-3">
-  <LogoSymbol className="rounded-full h-12 w-12 m-0 bg-black"/>
-  <h1 className="m-0 bg-transparent border-none">E2B</h1>
+
+
+<div className="flex flex-col items-center justify-start w-full">
+  <div className="flex items-center justify-center gap-3">
+    <LogoSymbol className="rounded-full h-12 w-12 m-0 bg-black"/>
+    <h1 className="m-0 bg-transparent border-none">E2B</h1>
+  </div>
+  <h4 className="text-gray-400 text-lg">
+    Open source computation layer for AI apps and LLMs
+  </h4>
+  <Image
+    className="h-[512px] w-auto"
+    src={aiStack}
+  />
 </div>
-An open source code execution layer for AI apps and LLMs. {{ className: 'lead' }}
 
 
 E2B is an open source cloud infrastructure designed to help developers add **AI-powered code execution capabilities** to their AI apps.
@@ -23,20 +35,219 @@ E2B is an open source cloud infrastructure designed to help developers add **AI-
 E2B makes it easy to build autonomous software that runs AI-generated code like ChatGPT-like apps with code interpreters or AI coding agents & assistants. <br />
 We distribute SDKs in [JavaScript](), [TypeScript](), and [Python](). Our SDKs work with Node.js (`v16.0+`), Python (`v3.8+`), [serverless functions]() and [edge functions]() environments.
 
+
 ## Hello World Example
 ChatGPT-like app with code interpreter based on your tech stack and with E2B running the AI-generated code.
 <HelloWorld/>
 
-```ts
-import CodeInterpreter from '@e2b/code-interpreter'
+<CodeGroup isRunnable={false} isFilename>
+```js {{ title: 'api/chat/route.ts', isFileName: true }}
+import {
+  OpenAIStream,
+  StreamingTextResponse,
+} from 'ai'
+import OpenAI from 'openai'
+import { CodeInterpreterStream } from 'e2b' // $HighlightLine
 
-CodeInterpreter.run()
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+})
+
+export const runtime = 'edge'
+
+export async function POST(req: Request) {
+  const { messages } = await req.json()
+
+  const response = await openai.chat.completions.create({
+    model: 'gpt-4',
+    stream: true,
+    max_tokens: 1000,
+    messages: [
+      {
+        role: 'system',
+        // Instruct the LLM to respond in Markdown
+        content: 'You are a senior python developer. Write messages to the user in Markdown.', // $HighlightLine
+      },
+      ...messages,
+    ],
+  })
+
+  // Initialize the code interpreter stream
+  // Select Markdown as the format of the LLM messages
+  //  - You can also use JSON and provide custom parsers
+  // Specify that we want to execute code blocks one by one after each other
+  // Specify what code blocks should be executed based on passed programming languages
+  const ciStream = CodeInterpreterStream.autorun({ // $HighlightLine
+    format: 'markdown', // $HighlightLine
+    runtimeMode: 'sequiential', // $HighlightLine
+    languages: ['python', 'bash'], // $HighlightLine
+  }) // $HighlightLine
+
+  // Pass the OpenAI stream to code interpreter stream
+  // The right code blocks will get executed
+  const stream = OpenAIStream(response)
+    .pipeThrough(ciStream) // $HighlightLine
+
+  return new StreamingTextResponse(stream)
+}
 ```
-Select your tech stack:
 
+```jsx {{ title: 'page.tsx', isFileName: true }}
+'use client'
+import React from 'react'
+import { useChat } from 'ai/react'
 
-Select runtime
-Select provider
+// Import our custom Markdown component
+import { Markdown } from '@/components/Markdown' // $HighlightLine
+
+export default function Chat() {
+  const { messages, input, handleInputChange, handleSubmit } = useChat()
+
+  return (
+    <div className="flex flex-col items-center justify-start overflow-hidden max-h-full w-full h-full gap-2">
+      <div className="flex-1 flex flex-col mx-auto gap-2 w-full max-w-2xl">
+        {messages.map((m) => (
+          <>
+            {m.role === "user" ? (
+              <div
+                key={m.id}
+                className={'py-1 px-4 border bg-blue-50 flex items-center justify-between'}
+              >
+                <span className="text-gray-400 font-bold">{`>`}</span>
+                <span className="flex-1 text-right">{m.content}</span>
+              </div>
+            ) : (
+              <div
+                className="py-1 px-4 border w-full min-h-[120px]"
+                key={m.id}
+              >
+                {/* The messages coming from the LLM are in markdown format */}
+                <Markdown markdown={m.content} />
+              </div>
+            )}
+          </>
+        ))}
+
+        <form onSubmit={handleSubmit} className="w-full max-w-2xl flex align-center justify-between gap-2 relative mb-8">
+          <input
+            className="flex-1 border border-gray-300 rounded p-2 w-full pl-8 outline-none"
+            value={input}
+            onChange={handleInputChange}
+            placeholder="Ask AI Developer..."
+            autoFocus
+          />
+          <span className="text-gray-400 font-bold absolute left-4 top-1/2 -translate-y-1/2">{`>`}</span>
+          <button type="submit" className="absolute top-0 left-[calc(100%+8px)] bottoms-0 border border-gray-300 rounded p-2">Send</button>
+        </form>
+      </div>
+    </div>
+  )
+}
+```
+
+```jsx {{ title: 'components/Markdown.tsx', isFileName: true }}
+import { FC, memo } from 'react'
+// Use re-mark to parse markdown
+import ReactMarkdown, { Options } from 'react-markdown' // $HighlightLine
+// Import our custom CodeBlock component
+import CodeBlock from '@/components/CodeBlock' // $HighlightLine
+
+export interface Props {
+  markdown: string
+}
+
+export const MemoizedReactMarkdown: FC<Options> = memo(
+  ReactMarkdown,
+  (prevProps, nextProps) =>
+    prevProps.children === nextProps.children &&
+    prevProps.className === nextProps.className
+)
+
+export function Markdown({
+  markdown,
+}: Props) {
+  return (
+    <MemoizedReactMarkdown
+      className="prose break-words dark:prose-invert prose-p:leading-relaxed prose-pre:p-0"
+      components={{
+        // Render our custom CodeBlock component if there's a multiline
+        // code block in the markdown that was sent by the LLM
+        code({ node, className, children, ...props }) { // $HighlightLine
+          const isInline = node?.position?.start.line === node?.position?.end.line  // $HighlightLine
+          if (isInline) { // $HighlightLine
+            return ( // $HighlightLine
+              <code {...props}>{children}</code> // $HighlightLine
+            ) // $HighlightLine
+          } // $HighlightLine
+          return (  // $HighlightLine
+            <CodeBlock // $HighlightLine
+              code={children as string} // $HighlightLine
+              {...props} // $HighlightLine
+            /> // $HighlightLine
+          ) // $HighlightLine
+        } // $HighlightLine
+      }}
+    >
+      {markdown}
+    </MemoizedReactMarkdown>
+  )
+}
+```
+
+```jsx {{ title: 'components/CodeBlock.tsx', isFileName: true }}
+// Import the E2B hook that fetches code execution results based on code block ID
+import { useCodeInterpreterResults } from 'e2b' // $HighlightLine
+
+export interface Props {
+  code: string
+  codeBlockId: string
+}
+
+// This CodeBlockc components renders every multiline code block in the markdown from LLM
+export function CodeBlock({
+  code,
+  // The code block ID is automatically generated on the backed by E2B's code interpreter stream
+  // and gets parsed by remark, the markdown parser
+  codeBlockId, // $HighlightLine
+}: Props) {
+  // Pass the ID to the hook and get code execution results
+  const { stdout, stderr, files, isLoading } = useCodeInterpreterResults(codeBlockId) // $HighlightLine
+
+  return (
+    <div className="w-full flex flex-col items-start gap-4 mb-4 py-4 border-b">
+      <div className="w-full flex flex-col items-start rounded border p-2 space-y-4 border border-zinc-300 bg-zinc-100 whitespace-pre-line text-sm">
+        <div className="flex items-center justify-center gap-1">
+          <span className="text-zinc-400 text-xs">Code</span>
+        </div>
+        <pre
+          className="font-mono text-zinc-800 overflow-x-auto max-w-full"
+        >
+          {code}
+        </pre>
+      </div>
+
+      <div className="w-full flex flex-col items-start rounded border p-2 space-y-4 border border-zinc-300 bg-zinc-100 whitespace-pre-line text-sm">
+        <div className="flex items-center justify-center gap-1">
+          <span className="text-zinc-400 text-xs">Output</span>
+          {isLoading && <span className="animate-spin text-zinc-500" size={12}>Loading...</span>}
+        </div>
+        {stdout && (
+          <pre className="font-mono overflow-x-auto max-w-full">
+            {stdout}
+          </pre>
+        )}
+        {stderr && (
+          <pre className="font-mono text-red-500 overflow-x-auto max-w-full">
+            {stderr}
+          </pre>
+        )}
+      </div>
+    </div>
+  )
+}
+```
+</CodeGroup>
+
 
 ## Integrations
 We offer native integrations to popular frameworks. Follow our guides for [React](), [Next.js](), [Svelte](), [Vue](), [Astro.js](), or [Remix]().
@@ -57,74 +268,21 @@ We offer native integrations to popular frameworks. Follow our guides for [React
   - Replicate
   - Vercel AI SDK
 
-# TODO: Add RAG examples
+{/* # TODO: Add RAG examples */}
+
+{/* E2B is an open source infrastructure with SDK that allows */}
+{/* E2B is the cloud computer for your agent */}
+
+{/* Agents need: */}
+{/* - agents need access to fs -> allows stateful ops */}
+{/* - agents need arbitrary runtime (90 seconds vs 90 minutes) */}
+{/* - download/upload */}
+{/* - network access */}
+{/* - state, repeated requests to the same history */}
 
 ## Templates & Example apps
-TODO
-
----
-
-E2B is an open source infrastructure with SDK that allows
-E2B is the cloud computer for your agent
----
-
-Agents need:
-- agents need access to fs -> allows stateful ops
-- agents need arbitrary runtime (90 seconds vs 90 minutes)
-- download/upload
-- network access
-- state, repeated requests to the same history
-
----
-
-
-## Hello world example
-
-
-```js
-import { Sandbox } from 'e2b'
-
-
-
-
-
-```
-
-## How E2B fits in the AI stack
-todo
-
-## Examples
-
-### Guides from our cookbook
-- Build custom GPT-4 code interpreter
-- Interactive charts
-- Streaming code execution output
-- Stateful code execution
-- Building coding agent
-- Giving coding agents skill library
-- ???
-
-### Templates
-- ??? (Have it separate?)
-- Deploy code interpreter
-- Deploy your data scientist
-
-### Use with LLMs
-- OpenAI
-- Claude
-- Mistral
-- AWS Bedrock
-- Cohere
-- Fireworks
-- Hugging Face
-- LangChain
-
-### Use from frontend
-- Nextjs
-- React.js
-- Astro.js
-
-### Use from backend
-- Vercel's serverless functions
-- Vercel's edge functions
-- Fast.api server
+- Custom GPT-4 code interpreter
+- Coding AI assistant
+- AI coding agent with skill library
+- AI assistant with cloud browser
+{/* - Interactive charts */}
