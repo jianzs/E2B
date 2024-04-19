@@ -8,9 +8,18 @@ async function createSandbox() {
     },
   })
 
-  sandbox.process.startAndWait('sudo apt-get install -y sysbench && sysbench memory --memory-block-size=512M --memory-total-size=512MB --memory-oper=write run').catch(console.error).then(() => {
+  // sandbox.process.startAndWait('sysbench memory --memory-block-size=512M --memory-total-size=512MB --memory-oper=write run').catch(console.error).then(() => {
+  //   // sandbox.close()
+  // })
+  sandbox.process.startAndWait('sudo apt-get install -y sysbench').catch(console.error).then(() => {
     // sandbox.close()
   })
+  // sandbox.process.startAndWait('sudo apt-get install -y sysbench && sysbench memory --memory-block-size=512M --memory-total-size=512MB --memory-oper=write run').catch(console.error).then(() => {
+  //   // sandbox.close()
+  // })
+  // sandbox.process.startAndWait('while true; do echo ".......................__><<<<,,,,,,,,,"; sleep 1; done').catch(console.error).then(() => {
+  //   // sandbox.close()
+  // })
 
   return sandbox
 }
@@ -34,7 +43,7 @@ async function createBatch<T>(length: number, m: () => Promise<T>): Promise<T[]>
 }
 
 const batchSize = 150
-const batchCount = 300
+const batchCount = 150
 
 const sandboxes: Sandbox[] = []
 
@@ -67,6 +76,7 @@ function wait(ms: number) {
 while (true) {
   console.log('-------------------')
   console.log(`> from ${batchCount * batchSize} sandboxes, ${sandboxes.length} were created`)
+  await wait(2000)
 }
 
 // process.exit(0)
