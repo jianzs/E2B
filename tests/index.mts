@@ -1,45 +1,16 @@
 import { Sandbox } from 'e2b'
 
-const p = `
-import time
-
-print('start')
-
-for i in range(10):
-    print(i)
-    time.sleep(1)
-
-print('end')
-
-
-import requests
-
-url = 'https://www.google.com/'
-
-response = requests.get(url)
-
-if response.status_code == 200:
-    with open('google.html', 'w', encoding='utf-8') as file:
-        file.write(response.text)
-    print('Website downloaded successfully.')
-else:
-    print(f'Failed to download website. Status code: {response.status_code}')
-
-`
-
 async function createSandbox() {
   const sandbox = await Sandbox.create({
-    timeout: 20000,
     logger: {
       warn: console.warn,
       error: console.error,
     },
   })
 
-  const out = await sandbox.process.startAndWait('pip install requests')
-  console.log('OUT1:', out)
-  const o2 = await sandbox.process.startAndWait(`python3 -c "${p}"`)
-  console.log('OUT2:', o2)
+  sandbox.process.startAndWait('sudo apt-get install -y sysbench && sysbench memory --memory-block-size=512M --memory-total-size=512MB --memory-oper=write run').catch(console.error).then(() => {
+    // sandbox.close()
+  })
 
   return sandbox
 }
@@ -62,43 +33,40 @@ async function createBatch<T>(length: number, m: () => Promise<T>): Promise<T[]>
     .filter(notEmpty)
 }
 
-const batchSize = 1
-const batchCount = 1
+const batchSize = 150
+const batchCount = 300
 
 const sandboxes: Sandbox[] = []
 
 for (let i = 0; i < batchCount; i++) {
-  const s = await createBatch(batchSize, createSandbox)
-  console.log(`> batch ${i + 1}: ${s.length} sandboxes created`)
-  if (s.length > 0) {
-    const first = s[0]
-    try {
-      await first.keepAlive(60 * 60 * 1000) // 4 hour
-      // Remove the first element
-    } catch (error) {
-      console.error('ERROR:', error)
-    }
-  }
-
-  sandboxes.push(...s)
+  createBatch(batchSize, createSandbox).then((s) => {
+    console.log(`> batch ${i + 1}: ${s.length} sandboxes created`)
+    sandboxes.push(...s)
+  })
+  await wait(500)
 }
 
-for (const s of sandboxes) {
-  try {
-    s.close()
-
-    // Randomly kill some sandboxes
-    if (Math.random() > 0.5) {
-      await Sandbox.kill(s.id)
-      continue
-    }
-  } catch (error) {
-    console.error('ERROR:', error)
-  }
+function wait(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
+// for (const s of sandboxes) {
+//   try {
+//     s.close()
 
-console.log('-------------------')
-console.log(`> from ${batchCount * batchSize} sandboxes, ${sandboxes.length} were created`)
+//     // Randomly kill some sandboxes
+//     if (Math.random() > 0.5) {
+//       await Sandbox.kill(s.id)
+//       continue
+//     }
+//   } catch (error) {
+//     console.error('ERROR:', error)
+//   }
+// }
 
-process.exit(0)
+while (true) {
+  console.log('-------------------')
+  console.log(`> from ${batchCount * batchSize} sandboxes, ${sandboxes.length} were created`)
+}
+
+// process.exit(0)
