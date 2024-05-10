@@ -126,7 +126,7 @@ export class SandboxConnection {
           '```\n' +
           "import { CodeInterpreter } from '@e2b/code-interpreter'\n" +
           'const myCodeInterpreter = await CodeInterpreter.create()\n' +
-          '``',
+          '```',
       )
     }
 
