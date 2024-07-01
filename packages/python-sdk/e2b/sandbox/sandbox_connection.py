@@ -56,6 +56,7 @@ class RunningSandbox(BaseModel):
     cpu_count: int
     memory_mb: int
     started_at: datetime
+    end_at: datetime
 
 
 class SandboxConnection:
@@ -423,9 +424,7 @@ class SandboxConnection:
             api = client.SandboxesApi(self._api_client)
             while True:
                 if not self._is_open:
-                    logger.debug(
-                        f"Cannot refresh sandbox - it was closed. {self.id}"
-                    )
+                    logger.debug(f"Cannot refresh sandbox - it was closed. {self.id}")
                     return
                 sleep(SANDBOX_REFRESH_PERIOD)
                 try:
@@ -459,7 +458,9 @@ class SandboxConnection:
             self._close()
 
     @staticmethod
-    def list(api_key: Optional[str] = None, domain: str = DOMAIN) -> List[RunningSandbox]:
+    def list(
+        api_key: Optional[str] = None, domain: str = DOMAIN
+    ) -> List[RunningSandbox]:
         """
         List all running sandboxes.
 
@@ -479,7 +480,9 @@ class SandboxConnection:
             ]
 
     @staticmethod
-    def kill(sandbox_id: str, api_key: Optional[str] = None, domain: str = DOMAIN) -> None:
+    def kill(
+        sandbox_id: str, api_key: Optional[str] = None, domain: str = DOMAIN
+    ) -> None:
         """
         Kill the running sandbox specified by the sandbox ID.
 

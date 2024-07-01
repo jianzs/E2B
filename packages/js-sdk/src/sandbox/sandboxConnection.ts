@@ -211,6 +211,7 @@ export class SandboxConnection {
         ...(sandbox.alias && { alias: sandbox.alias }),
         ...(sandbox.metadata && { metadata: sandbox.metadata }),
         startedAt: new Date(sandbox.startedAt),
+        endAt: new Date(sandbox.endAt),
       }))
     } catch (e) {
       if (e instanceof listSandboxes.Error) {
