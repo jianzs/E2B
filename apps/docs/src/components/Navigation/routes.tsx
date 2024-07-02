@@ -1,5 +1,4 @@
 import {
-  BarChart,
   Braces,
   ChevronRightSquare,
   Cog,
@@ -68,11 +67,6 @@ export const routes = [
         icon: <DollarSign strokeWidth={1} size={20} />,
         title: 'Pricing',
         href: '/docs/pricing',
-      },
-      {
-        icon: <BarChart strokeWidth={1} size={20} />,
-        title: 'Track usage',
-        href: '/docs/usage',
       },
       {
         icon: <ShieldQuestion strokeWidth={1} size={20} />,
