@@ -56,6 +56,7 @@ export const AccountSelector = ({ teams, user, currentTeam, setCurrentTeam, setT
     
     setTeams([...teams, team])
     setCurrentTeam(team)
+    setTeamName('')
   }
   
   return(
