@@ -3,6 +3,7 @@ import { Card, CardContent } from '../ui/card'
 import { LoaderIcon } from 'lucide-react'
 import LineChart from './Chart'
 import { MonthlyCosts, useUsage } from '@/utils/useUsage'
+import {toast} from "@/components/ui/use-toast";
 
 const usageUrl = `${process.env.NEXT_PUBLIC_BILLING_API_URL}/teams/usage`
 
@@ -23,6 +24,10 @@ export const UsageContent = ({ currentApiKey }: { currentApiKey: string | null }
       })
       if (!response.ok) {
         // TODO: Add sentry event here
+        toast({
+            title: 'An error occurred',
+            description: 'We were unable to fetch the usage data',
+        })
         console.log(response)
         return
       }

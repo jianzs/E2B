@@ -85,6 +85,10 @@ export const KeysContent = ({ user, currentTeam, currentApiKey }: { user: User, 
     
     if (!res.ok) {
       // TODO: Add sentry event here
+      toast({
+        title: 'An error occurred',
+        description: 'We were unable to create the API key',
+      })
       return
     } 
 
