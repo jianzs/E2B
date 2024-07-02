@@ -32,6 +32,7 @@ export const AccountSelector = ({ teams, user, currentTeam, setCurrentTeam, setT
     const res = await fetch(createTeamUrl, {
       method: 'POST',
       headers: {
+        'Content-Type': 'application/json',
         'X-User-Access-Token': user.accessToken,
       },
       body: JSON.stringify({
