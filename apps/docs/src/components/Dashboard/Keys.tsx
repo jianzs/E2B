@@ -53,6 +53,13 @@ export const KeysContent = ({ user, currentTeam, currentApiKey }: { user: User, 
 
     if (error) {
       // TODO: Add sentry event here
+      toast(
+          {
+          title: 'An error occurred',
+          description: 'We were unable to delete the API key',
+
+        },
+      )
       console.log(error)
       return
     }
