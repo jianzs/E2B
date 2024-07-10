@@ -71,9 +71,7 @@ function SwitchTierButton({ team }: { team: Team }) {
           <TierActiveTag />
         )}
 
-
-
-        {team.tier !== tiers.pro.id && (
+        {user.pricingTier.id !== tiers.pro.id && (
           <Button
             onClick={createCheckoutSession}
           >
